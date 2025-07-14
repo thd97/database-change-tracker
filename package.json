@@ -1,0 +1,42 @@
+{
+  "name": "Tool view change database by DangTH from Merchize with love ❤️",
+  "version": "1.0.0",
+  "main": "public/electron.js",
+  "scripts": {
+    "start": "concurrently \"cross-env BROWSER=none react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
+    "build": "react-scripts build && electron-builder",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^5.18.0",
+    "@mui/material": "^5.18.0",
+    "electron": "^30.0.0",
+    "mongodb": "^3.7.3",
+    "mysql2": "^3.14.2",
+    "pg": "^8.16.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0",
+    "cross-env": "^7.0.3",
+    "electron-builder": "^24.0.0",
+    "react-scripts": "^5.0.1",
+    "wait-on": "^7.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
