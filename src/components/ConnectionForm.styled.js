@@ -36,7 +36,6 @@ export const FormContainer = styled.div`
   }
 `;
 
-// Add a styled Box for button rows to keep their height stable
 export const ButtonRow = styled.div`
   display: flex;
   gap: 16px;

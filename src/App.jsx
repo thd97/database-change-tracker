@@ -61,14 +61,12 @@ const App = () => {
       loading: false,
       error: '',
       collections: [],
-      logs: [], // Thêm logs cho từng tab
+      logs: [],
       logError: '',
     },
   ]);
-  // Đảm bảo tab đầu tiên luôn được focus khi mở app
   const [activeTab, setActiveTab] = useState(0);
   const [openSettingManager, setOpenSettingManager] = useState(false);
-  // State timezoneOffset chung cho app
   const [timezoneOffset, setTimezoneOffset] = useState(() => {
     const raw = localStorage.getItem(TIMEZONE_KEY);
     return raw !== null ? Number(raw) : 0;
@@ -90,14 +88,11 @@ const App = () => {
     };
   }, [tabs.length]);
 
-  // Lắng nghe log event từ backend cho mọi tab MongoDB (đa channel)
   useEffect(() => {
-    // Lưu các unsub function để cleanup khi đóng tab
     const unsubscribers = [];
     tabs.forEach((tab, idx) => {
       if (tab && tab.dbType === 'mongodb' && tab.connectionInfo && tab.connectionInfo.uri && tab.connectionInfo.database) {
         const { ipcRenderer } = window.require('electron');
-        // Tạo channel riêng cho từng tab
         const channel = `db-log-event-${tab.id}`;
         ipcRenderer.send('db-watch-log', { uri: tab.connectionInfo.uri, database: tab.connectionInfo.database, channel });
         const onLog = (evt, log) => {
@@ -144,7 +139,7 @@ const App = () => {
       loading: false,
       error: '',
       collections: [],
-      logs: [], // Thêm logs cho từng tab
+      logs: [],
       logError: '',
       selectedOps: [],
       selectedCols: [],
@@ -175,13 +170,11 @@ const App = () => {
     }
   };
 
-  // Sửa handleConnect: clear log khi connect mới
   const handleConnect = async (index, dbType, connectionInfo) => {
     const updatedTabs = [...tabs];
     updatedTabs[index].dbType = dbType;
     updatedTabs[index].connectionInfo = connectionInfo;
     updatedTabs[index].title = `${dbType} - ${connectionInfo.database || connectionInfo.uri}`;
-    // Nếu là MongoDB, lấy danh sách collections và lưu vào tab
     if (dbType === 'mongodb' && connectionInfo.uri && connectionInfo.database) {
       try {
         const { MongoClient } = window.require('mongodb');
@@ -194,13 +187,11 @@ const App = () => {
         updatedTabs[index].collections = [];
       }
     }
-    // Clear log và filter khi connect mới
     updatedTabs[index].logs = [];
     updatedTabs[index].logError = '';
     updatedTabs[index].selectedOps = [];
     updatedTabs[index].selectedCols = [];
     updatedTabs[index].searchId = '';
-    // Only reset ConnectionForm state for PostgreSQL/SQL
     if (dbType === 'postgresql' || dbType === 'sql') {
       updatedTabs[index].dbList = [];
       updatedTabs[index].loading = false;
@@ -216,7 +207,6 @@ const App = () => {
     setTabs(updatedTabs);
   };
 
-  // Thêm các hàm cập nhật state cho từng tab
   const updateTabState = (index, patch) => {
     setTabs(tabs => {
       const updated = [...tabs];
@@ -225,7 +215,6 @@ const App = () => {
     });
   };
 
-  // Thêm hàm clear log cho tab
   const clearTabLog = (tabIdx) => {
     setTabs(tabs => {
       const updated = [...tabs];

@@ -57,7 +57,6 @@ const ConnectionForm = ({
         setLoading(false);
         if (res.success) {
           setDbList(res.databases);
-          // For PostgreSQL/SQL, immediately call onConnect to switch to LogViewer
           onConnect(formState.dbType, formState);
         } else {
           setError(res.error || 'Connection failed');

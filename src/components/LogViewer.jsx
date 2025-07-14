@@ -20,19 +20,14 @@ const OPERATION_COLORS = {
 const LogViewer = ({ connectionInfo, dbType, collections: propCollections, logs, setLogs, logError, onClearLog, selectedOps, setSelectedOps, selectedCols, setSelectedCols, searchId, setSearchId, timezoneOffset = 0 }) => {
   const [error, setError] = useState('');
   const [collections, setCollections] = useState(propCollections || []);
-  // const [selectedOps, setSelectedOps] = useState([]);
-  // const [selectedCols, setSelectedCols] = useState([]);
-  // const [searchId, setSearchId] = useState('');
   const [clearAnim, setClearAnim] = useState(false);
   const logRef = useRef();
 
-  // Lấy tên setting và database
   const settingName = connectionInfo && connectionInfo.settingName ? connectionInfo.settingName : '';
   const dbName = connectionInfo && connectionInfo.database ? connectionInfo.database : '';
 
-  // Các action có thể xem chi tiết
   const DETAIL_ACTIONS = ['insert', 'update', 'replace'];
-  const [openDetail, setOpenDetail] = useState({}); // { idx: boolean }
+  const [openDetail, setOpenDetail] = useState({});
 
   const handleToggleDetail = idx => {
     setOpenDetail(prev => ({ ...prev, [idx]: !prev[idx] }));
@@ -42,7 +37,6 @@ const LogViewer = ({ connectionInfo, dbType, collections: propCollections, logs,
     if (Array.isArray(propCollections)) setCollections(propCollections);
   }, [propCollections]);
 
-  // Không fetch log ở đây nữa, log được truyền từ props
 
   const filteredLogs = useMemo(() => {
     const filtered = (logs || []).filter(log => {
@@ -51,7 +45,7 @@ const LogViewer = ({ connectionInfo, dbType, collections: propCollections, logs,
       if (searchId && String(log._id) !== searchId) return false;
       return true;
     });
-    return filtered.slice().reverse(); // Đảo ngược, mới nhất trên cùng
+    return filtered.slice().reverse();
   }, [logs, selectedOps, selectedCols, searchId]);
 
   const sortedCollections = useMemo(() => {
@@ -67,7 +61,6 @@ const LogViewer = ({ connectionInfo, dbType, collections: propCollections, logs,
     return `${selected.length} selected`;
   };
 
-  // Animation cho button clear log
   const handleClearLog = () => {
     setClearAnim(true);
     setTimeout(() => {
@@ -76,13 +69,10 @@ const LogViewer = ({ connectionInfo, dbType, collections: propCollections, logs,
     }, 200);
   };
 
-  // Format time theo timezoneOffset
   const formatTime = (isoString) => {
     if (!isoString) return '';
     const date = new Date(isoString);
-    // Cộng offset (theo giờ)
     const local = new Date(date.getTime() + timezoneOffset * 60 * 60 * 1000);
-    // Format: yyyy-MM-dd HH:mm:ss
     const pad = n => n.toString().padStart(2, '0');
     return `${local.getUTCFullYear()}-${pad(local.getUTCMonth()+1)}-${pad(local.getUTCDate())} ${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())}`;
   };

@@ -1,7 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
-// Require các driver DB
 const { MongoClient } = require('mongodb');
 const { Client: PgClient } = require('pg');
 const mysql = require('mysql2/promise');
@@ -19,7 +18,6 @@ function createWindow() {
     },
   });
 
-  // Tải React dev server trong development
   win.loadURL('http://localhost:3000');
 //   win.openDevTools();
   Menu.setApplicationMenu(null);
@@ -39,7 +37,6 @@ app.on('activate', () => {
   }
 });
 
-// IPC: Nhận yêu cầu connect DB từ renderer
 ipcMain.handle('db-connect', async (event, { dbType, connectionInfo }) => {
   try {
     if (dbType === 'mongodb') {
@@ -62,7 +59,6 @@ ipcMain.handle('db-connect', async (event, { dbType, connectionInfo }) => {
       await client.end();
       return { success: true, databases: res.rows.map(r => r.datname) };
     } else if (dbType === 'sql') {
-      // MySQL
       const conn = await mysql.createConnection({
         host: connectionInfo.host,
         port: connectionInfo.port,
@@ -79,7 +75,6 @@ ipcMain.handle('db-connect', async (event, { dbType, connectionInfo }) => {
   }
 });
 
-// Helper: Chuyển ObjectId, Date thành string đệ quy cho object
 function serializeMongo(obj) {
   if (Array.isArray(obj)) return obj.map(serializeMongo);
   if (obj && typeof obj === 'object') {
@@ -92,12 +87,10 @@ function serializeMongo(obj) {
   return obj;
 }
 
-// Quản lý change stream và client theo channel
 const mongoStreams = {};
 
-// IPC: Theo dõi log MongoDB Change Stream, đa channel
 ipcMain.on('db-watch-log', async (event, { uri, database, channel }) => {
-  if (!channel) return; // Bắt buộc phải có channel
+  if (!channel) return;
   let client;
   try {
     client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
@@ -126,7 +119,6 @@ ipcMain.on('db-watch-log', async (event, { uri, database, channel }) => {
   }
 });
 
-// IPC: Unsubscribe change stream cho channel
 ipcMain.on('db-log-unsubscribe', async (event, { channel }) => {
   if (channel && mongoStreams[channel]) {
     try {

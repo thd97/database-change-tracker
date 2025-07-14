@@ -32,12 +32,12 @@ const emptySetting = {
   username: '',
   password: '',
   database: '',
-  timezoneOffset: 0, // offset giờ, vd: 0, -7, 7
+  timezoneOffset: 0,
 };
 
 const SettingManagerDialog = ({ open, onClose, timezoneOffset = 0, setTimezoneOffset }) => {
   const [settings, setSettings] = useState(getSavedSettings());
-  const [editing, setEditing] = useState(null); // index or null
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptySetting);
   const [isNew, setIsNew] = useState(false);
 
@@ -85,10 +85,8 @@ const SettingManagerDialog = ({ open, onClose, timezoneOffset = 0, setTimezoneOf
     setIsNew(false);
   };
 
-  // Helper: validate chỉ cho nhập số nguyên (âm, 0, dương)
   const handleTimezoneInput = (e) => {
     const val = e.target.value;
-    // Chỉ cho phép số nguyên, có thể có dấu - phía trước
     if (/^-?\d*$/.test(val)) {
       setTimezoneOffset(Number(val));
     }
