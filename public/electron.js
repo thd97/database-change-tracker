@@ -37,10 +37,22 @@ app.on('activate', () => {
   }
 });
 
+function removeLoadBalancedParam(uri) {
+  return uri
+    .replace(/([?&])loadBalanced=false(&|$)/, (match, p1, p2) => {
+      if (p1 === '?' && p2) return '?';
+      if (p1 === '?' && !p2) return '';
+      if (p1 === '&' && p2) return '&';
+      return '';
+    })
+    .replace(/\?$/, '');
+}
+
 ipcMain.handle('db-connect', async (event, { dbType, connectionInfo }) => {
   try {
     if (dbType === 'mongodb') {
-      const client = new MongoClient(connectionInfo.uri, { serverSelectionTimeoutMS: 5000 });
+      const cleanUri = removeLoadBalancedParam(connectionInfo.uri);
+      const client = new MongoClient(cleanUri, { serverSelectionTimeoutMS: 5000 });
       await client.connect();
       const dbs = await client.db().admin().listDatabases();
       await client.close();
@@ -93,7 +105,9 @@ ipcMain.on('db-watch-log', async (event, { uri, database, channel }) => {
   if (!channel) return;
   let client;
   try {
-    client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+    // Xoá loadBalanced=false khỏi URI nếu có
+    const cleanUri = removeLoadBalancedParam(uri);
+    client = new MongoClient(cleanUri, { serverSelectionTimeoutMS: 5000 });
     await client.connect();
     const db = client.db(database);
     const changeStream = db.watch([], { fullDocument: 'updateLookup' });
@@ -128,3 +142,5 @@ ipcMain.on('db-log-unsubscribe', async (event, { channel }) => {
     delete mongoStreams[channel];
   }
 });
+
+
